@@ -36,3 +36,4 @@ This is a single-device demo. The user switcher and action checks illustrate per
 ## Optional Supabase phase
 
 Shared-workspace authentication, tenant isolation and transactional persistence are implemented behind `APP_DATA_MODE=supabase`. Demo remains the default; the modes do not automatically copy data. See [Supabase setup](docs/SUPABASE_SETUP.md) before enabling shared mode. The server secret stays in the ignored `.env.local` file. Run `pnpm check:connection` after configuring it privately. The reviewed migration was applied to the supplied project on 2026-10-17; Admin account and membership setup are still pending.
+"# Macqul-Reparing-" 
