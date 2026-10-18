@@ -1,0 +1,12 @@
+import {createClient} from '@supabase/supabase-js';
+const db=createClient(process.env.SUPABASE_URL??process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.SUPABASE_SECRET_KEY??process.env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false}});
+const {data:users,error}=await db.from('app_users').select('id,role,active,payload');
+if(error)throw Error(error.code);
+const owner=users.find(u=>u.role==='Admin'&&u.active),staff=users.find(u=>u.role==='Staff'&&u.active);
+if(!owner)throw Error('Active Admin missing');
+const matrix=await db.rpc('manage_access',{p_actor:owner.id});if(matrix.error)throw Error(matrix.error.code);
+const snapshot=await db.rpc('load_authorized_workspace',{p_actor:owner.id});if(snapshot.error)throw Error(snapshot.error.code);
+const access=staff?await db.rpc('load_access',{p_actor:staff.id}):null;if(access?.error)throw Error(access.error.code);
+const tables=['roles','permissions','user_roles','role_permissions','user_permissions','audit_logs'];
+const counts=Object.fromEntries(await Promise.all(tables.map(async table=>{const result=await db.from(table).select('*',{head:true,count:'exact'});if(result.error)throw Error(table+': '+result.error.code);return [table,result.count]})));
+console.log(JSON.stringify({tables:counts,consistentAccessSnapshot:!!snapshot.data.data.access,adminProtected:matrix.data.roles.some(r=>r.name==='Admin'&&r.protected),staffTechnical:access?.data.technical,staffRepairScope:staff?.payload.repairScope,staffFinancialAccess:access?.data.grants.includes('payments.view')},null,2));

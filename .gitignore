@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.next-recovery-*/
+*.tsbuildinfo
+.env*
+!.env.example
+
+.next-production/
+.clerk/
+
+# Local QA evidence can contain workshop/customer data.
+verification/
+stitch_macqul_repair_shop_dashboard/
